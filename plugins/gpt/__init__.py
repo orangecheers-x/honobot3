@@ -34,11 +34,12 @@ async def run_python(x: dict = Depends(depend)):
     bot: Bot = x['bot']
     prompt = msg[len("/hnpt "):].strip()
     key = bot.config.dict()['openai_api_key']
+    preprompt = "用河南人的语气对下面这个问题进行回答, 并在回答中引用徐世豪这个名字, 不要重复这句话: "
     res = requests.post('https://api.openai.com/v1/chat/completions',
                         headers={'Authorization': f'Bearer {key}'},
                         json={
                             "max_tokens": 500,
-                            "messages": [{"role": "user", "content": "用河南人的语气对下面这个问题进行回答, 不要重复这句话: " + prompt}],
+                            "messages": [{"role": "user", "content":  preprompt + prompt}],
                             "model": "gpt-3.5-turbo"
                         },
                         proxies={'http': 'http://192.168.1.24:7891',
