@@ -25,16 +25,23 @@ handler = on_message(rule=Rule(group_checker, message_checker), priority=5)
 
 
 def depend(event: MessageEvent, bot: Bot):
-    return {"message": event.get_message().extract_plain_text(), "bot": bot}
+    return {"message": event.get_message().extract_plain_text(),
+            "bot": bot,
+            "group_id": event.get_session_id().split('_')[1]}
 
 
 @handler.handle()
-async def run_python(x: dict = Depends(depend)):
+async def hanldrmsg(x: dict = Depends(depend)):
     msg: str = x['message']
     bot: Bot = x['bot']
     prompt = msg[len("/hnpt "):].strip()
     key = bot.config.dict()['openai_api_key']
-    preprompt = "用河南人的语气对下面这个问题进行回答, 并在回答中引用徐世豪这个名字, 不要重复这句话."
+    preprompt = '用河南人的语气对下面这个问题进行回答, '
+    print(bot.config.dict())
+    if 'name_in_' + x['group_id'] in bot.config.dict():
+        preprompt += f"并在回答中引用{bot.config.dict()['name_in_' + x['group_id']]}这个名字, "
+    preprompt += "不要重复这句话."
+
     res = requests.post('https://api.openai.com/v1/chat/completions',
                         headers={'Authorization': f'Bearer {key}'},
                         json={
