@@ -18,19 +18,17 @@ config = Config.parse_obj(global_config)
 #     pass
 
 
-write_groups_list = ['341475083', '776324219']
 # write_groups_list = ['776324219']
 
 async def group_checker(event: Event) -> bool:
-    for i in write_groups_list:
+    for i in config.write_groups_list:
         if f"group_{i}" in event.get_session_id():
             return True
     return False
 
+
 async def message_checker(event: Event):
     return event.get_plaintext().startswith('+++py')
-
-
 
 
 handler = on_message(rule=Rule(group_checker, message_checker), priority=5)
@@ -42,7 +40,7 @@ def depend(event: MessageEvent):
 
 @handler.handle()
 async def run_python(x: dict = Depends(depend)):
-    msg:str = x['message']
+    msg: str = x['message']
     code = msg[len("+++py"):].strip()
     header = {
         'Host': 'tool.runoob.com',
@@ -51,7 +49,8 @@ async def run_python(x: dict = Depends(depend)):
         'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
     }
     sess = requests.session()
-    res = sess.get("https://www.runoob.com/try/runcode.php?filename=helloworld&type=cpp")
+    res = sess.get(
+        "https://www.runoob.com/try/runcode.php?filename=helloworld&type=cpp")
     token = res.text.split('token = \'')[1].split("'")[0]
     submiturl = 'https://tool.runoob.com/compile2.php'
     data = {

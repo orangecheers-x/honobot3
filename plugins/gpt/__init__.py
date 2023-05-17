@@ -10,12 +10,8 @@ global_config = get_driver().config
 config = Config.parse_obj(global_config)
 
 
-write_groups_list = ['341475083', '776324219']
-# write_groups_list = ['776324219']
-
-
 async def group_checker(event: Event) -> bool:
-    for i in write_groups_list:
+    for i in config.write_groups_list:
         if f"group_{i}" in event.get_session_id():
             return True
     return False
