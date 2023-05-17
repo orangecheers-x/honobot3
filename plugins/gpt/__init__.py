@@ -1,8 +1,9 @@
 import requests
 from nonebot import get_driver, on_message, logger
-from nonebot.adapters.mirai2 import MessageEvent, Event, Bot
+from nonebot.adapters.mirai2 import MessageEvent, Event, Bot, MessageChain, MessageSegment
 from nonebot.internal.params import Depends
 from nonebot.internal.rule import Rule
+import time
 
 from .config import Config
 
@@ -27,7 +28,8 @@ handler = on_message(rule=Rule(group_checker, message_checker), priority=5)
 def depend(event: MessageEvent, bot: Bot):
     return {"message": event.get_message().extract_plain_text(),
             "bot": bot,
-            "group_id": event.get_session_id().split('_')[1]}
+            "group_id": event.get_session_id().split('_')[1],
+            "sender": event.get_user_id()}
 
 
 @handler.handle()
@@ -53,4 +55,6 @@ async def hanldrmsg(x: dict = Depends(depend)):
                                  'https': 'http://192.168.1.24:7891'}
 
                         ).json()
-    await handler.finish(res['choices'][0]['message']['content'])
+    if x['group_id'] == '695449063':
+        time.sleep(10)
+    await handler.finish(MessageChain([MessageSegment.at(x['sender']), MessageSegment.plain(" " + res['choices'][0]['message']['content'])]))
