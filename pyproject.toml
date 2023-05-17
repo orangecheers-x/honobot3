@@ -1,0 +1,3 @@
+[tool.nonebot]
+plugins = []
+adapters = [{name = "mirai2", module_name = "nonebot.adapters.mirai2"}]
